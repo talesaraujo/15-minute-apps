@@ -1,7 +1,5 @@
 import unittest
 
-from unittest import TestCase
-
 """
     Sugestão de abordagem
 
@@ -11,3 +9,6 @@ from unittest import TestCase
     Classe abordada: MainWindow
     Métodos: file_save() e file_saveas()
 """
+
+if __name__ == "__main__":
+    unittest.main()
