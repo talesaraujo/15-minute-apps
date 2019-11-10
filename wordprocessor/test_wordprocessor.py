@@ -22,11 +22,12 @@ class TestMainWindow(unittest.TestCase):
         self.app = QApplication(sys.argv)
         self.app.setApplicationName("Megasolid Idiom")
         self.window = MainWindow()
-
-        self.app.exec_()
+        #self.app.exec_()
+        self.test_file_open()
 
     def test_file_open(self):
-        pass
+        result = self.window.read_from(str(__import__("pathlib").Path(__file__).parent)+r"\requirements.txt")
+        self.assertEqual(result, True)
 
     def test_file_save(self):
         pass

@@ -306,21 +306,27 @@ class MainWindow(QMainWindow):
         dlg.show()
 
     def file_open(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "HTML documents (*.html);Text documents (*.txt);All files (*.*)")
+        path, _ = QFileDialog.getOpenFileName(self, "Open file", "", "HTML documents (*.html);Text documents (*.txt);All files (*.*)") 
+        self.read_from(path)
 
+    def read_from(self,file_string_path):
+        #print(file_string_path)
         try:
-            with open(path, 'rU') as f:
+            with open(file_string_path, 'rU') as f:
                 text = f.read()
+                
 
         except Exception as e:
             self.dialog_critical(str(e))
+            return False
 
         else:
-            self.path = path
+            self.path = file_string_path
             # Qt will automatically try and guess the format as txt/html
             self.editor.setText(text)
             self.update_title()
-
+            return True
+    
     def file_save(self):
         if self.path is None:
             # If we do not have a path, we need to use Save As.
