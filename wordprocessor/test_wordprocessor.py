@@ -1,11 +1,14 @@
-#!/usr/bin/python
+    #!/usr/bin/python
  # -*- coding: utf-8 -*-
  
 import unittest
-import sys
+import os, sys
 
 from wordprocessor import MainWindow
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QFileDialog
+
+
+TESTFILE_DIR_PATH = os.getcwd() + "/loremipsum.txt"
 
 """
     Sugestão de abordagem
@@ -23,11 +26,20 @@ class TestMainWindow(unittest.TestCase):
         self.app.setApplicationName("Megasolid Idiom")
         self.window = MainWindow()
 
+    def test_file_open_successfully(self):
         self.app.exec_()
 
-    def test_file_open(self):
-        pass
+        # Abre o arquivo de texto de teste
+        with open(TESTFILE_DIR_PATH, newline='') as test_file:
+            text = test_file.read()
 
+        # Recupera o texto exibido pela janela
+        window_text = self.window.editor.toPlainText()
+
+        # Verifica se o caminho e o texto definidos pelo método file_open conferem
+        self.assertEqual(TESTFILE_DIR_PATH, self.window.path)
+        self.assertEqual(text, window_text)
+        
     def test_file_save(self):
         pass
 
