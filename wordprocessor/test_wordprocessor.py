@@ -1,50 +1,111 @@
-    #!/usr/bin/python
- # -*- coding: utf-8 -*-
- 
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+
 import unittest
 import os, sys
 
-from wordprocessor import MainWindow
 from PyQt5.QtWidgets import QApplication, QFileDialog
+from wordprocessor import TextEdit, MainWindow, hexuuid, splitext
 
 
-TESTFILE_DIR_PATH = os.getcwd() + "/loremipsum.txt"
 
-"""
-    Sugestão de abordagem
+if os.name == 'nt':
+    LOREMIPSUM_PATH = str(os.getcwd() + "\\loremipsum.txt").replace("\\", "/")
+else:
+    LOREMIPSUM_PATH = os.getcwd + "/lotemipsum.txt"
 
-    Requisito funcional a ser tratado: 
-    RF001 - Realizar operações de gerenciamento: abrir, salvar, salvar como
 
-    Classe abordada: MainWindow
-    Métodos: file_open(), file_save() e file_saveas()
-"""
+
+def get_some_text(path=LOREMIPSUM_PATH):
+    """
+        Obtém o texto de um arquivo do projeto. 
+        (Padrão definido para loremipsum.txt)
+    """
+    try:
+        with open(path, 'r') as text_file:
+            return text_file.read()
+
+    except FileNotFoundError:
+        print("O caminho fornecido não pode ser encontrado!")
+        return None
+
+
+class TestWordProcessor(unittest.TestCase):
+
+    def test_hexuuid(self):
+        """
+            Verifica se o retorno corresponde aos 32 caracteres de um hexadecimal utilizando uma expressão regular.
+        """
+        self.assertRegex(hexuuid(), '[0-9a-f]{32}')
+
+
+    def test_splitext(self):
+        """
+            Verifica se o caminho de retorno possui um tipo de arquivo definido e se este corresponde ao esperado.
+        """
+        self.assertEqual(splitext(LOREMIPSUM_PATH)[-4], ".")
+        self.assertEqual(LOREMIPSUM_PATH[-4:], splitext(LOREMIPSUM_PATH))
+
+
+
 class TestMainWindow(unittest.TestCase):
+    """
+        Classe abordada: MainWindow
 
+        Requisito funcional a ser tratado: 
+        RF001 - Realizar operações de gerenciamento: abrir, salvar, salvar como
+
+        Métodos: file_open(), file_save() e file_saveas()
+    """
     def setUp(self):
+        """
+            Definimos a instância da classe da janela MainWindow que servirá para todos os testes.
+        """
         self.app = QApplication(sys.argv)
         self.app.setApplicationName("Megasolid Idiom")
         self.window = MainWindow()
+        #self.app.exec_()
+
 
     def test_file_open_successfully(self):
-        self.app.exec_()
+        # Carrega o texto padrão
+        text_tomatch = get_some_text()
+  
+        # Executa a operação de abrir. Necessário informar /.../loremipsum.txt
+        # ou outro arquivo geral para padronizar o testes 
+        self.window.file_open()
 
-        # Abre o arquivo de texto de teste
-        with open(TESTFILE_DIR_PATH, newline='') as test_file:
-            text = test_file.read()
-
-        # Recupera o texto exibido pela janela
+        # Recupera o texto exibido pela janela após abrir o arquivo com file_open
         window_text = self.window.editor.toPlainText()
 
-        # Verifica se o caminho e o texto definidos pelo método file_open conferem
-        self.assertEqual(TESTFILE_DIR_PATH, self.window.path)
-        self.assertEqual(text, window_text)
+        # Verifica se o caminho e o texto padrão definidos pelo método file_open conferem
+        self.assertEqual(self.window.path, LOREMIPSUM_PATH)
+        self.assertEqual(window_text, text_tomatch)
         
+
     def test_file_save(self):
+        # 
         pass
 
-    def test_file_saveas(self):
-        pass
+
+    def test_file_saveas_succesfully(self):
+        # Fornecemos um caminho padronizado e um texto diferente para salvar o novo arquivo
+        new_path = LOREMIPSUM_PATH[:-4] + '2.txt'
+        new_text = get_some_text() + '\nRANDOM LINE APPENDED TO THE END OF THE TEXT'
+
+        # Aplica automaticamente esse novo texto no editor aberto
+        self.window.editor.setText(new_text)
+        
+        # Chama a função saveas(). Necessário informar explicitamente no diálogo o nome do 
+        # arquivo como ../loremipsum2.txt (sobrescrever) para padronizar o teste.
+        self.window.file_saveas()
+
+        # Abre o arquivo salvo pela função e verifica se o conteúdo confere com o esperado.
+
+        with open(new_path, 'r') as new_file:
+            # Confere se o texto salvo com o método confere com o padrão
+            self.assertEqual(new_file.read(), new_text)
+        
 
 if __name__ == "__main__":
     unittest.main()
