@@ -318,14 +318,14 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             self.dialog_critical(str(e))
-            return False
+            return ""
 
         else:
             self.path = file_string_path
             # Qt will automatically try and guess the format as txt/html
             self.editor.setText(text)
             self.update_title()
-            return True
+            return text
     
     def file_save(self):
         if self.path is None:
@@ -343,23 +343,30 @@ class MainWindow(QMainWindow):
 
     def file_saveas(self):
         path, _ = QFileDialog.getSaveFileName(self, "Save file", "", "HTML documents (*.html);Text documents (*.txt);All files (*.*)")
+        self.save_in(path)
 
-        if not path:
+    def save_in(self,file_path):
+        result = False
+        if not file_path:
             # If dialog is cancelled, will return ''
-            return
+            return result
 
-        text = self.editor.toHtml() if splitext(path) in HTML_EXTENSIONS else self.editor.toPlainText()
+        text = self.editor.toHtml() if splitext(file_path) in HTML_EXTENSIONS else self.editor.toPlainText()
 
         try:
-            with open(path, 'w') as f:
+            with open(file_path, 'w') as f:
                 f.write(text)
 
         except Exception as e:
             self.dialog_critical(str(e))
+            result = False
 
         else:
-            self.path = path
+            self.path = file_path
             self.update_title()
+            result = True
+
+        return result
 
     def file_print(self):
         dlg = QPrintDialog()
