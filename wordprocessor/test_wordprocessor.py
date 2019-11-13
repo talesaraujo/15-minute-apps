@@ -11,7 +11,7 @@ from wordprocessor import MainWindow, hexuuid, splitext
 if os.name == 'nt':
     LOREMIPSUM_PATH = str(os.getcwd() + "\\loremipsum.txt").replace("\\", "/")
 else:
-    LOREMIPSUM_PATH = os.getcwd + "/lotemipsum.txt"
+    LOREMIPSUM_PATH = os.getcwd() + "/loremipsum.txt"
 
 
 def get_some_text(path=LOREMIPSUM_PATH):
